@@ -55,10 +55,14 @@ It is the template engine use by the laravel. It's simple and powerful. We can a
 [Laravel Blade template reference](https://laravel.com/docs/5.4/blade)
 
 ### Laravel installation
-In order to install laravel first install the composer.
+If your application is running inside the Docker then first install the PHP Cli in the host operating system to interact with the composer and laravel artisan from host operating system.
+>$ sudo apt install php7.4-cli
 
+In order to install laravel first install the composer.
 ##### create new laravel project via composer
->$ composer create-project laravel/laravel app
+>$ composer create-project laravel/laravel app **//to install the latest version**
+
+>$ composer create-project --prefer-dist laravel/laravel blog "5.4.*" **//to install the specific version**
 
 The laravel app can be run the following command.
 >$ php artisan serve
