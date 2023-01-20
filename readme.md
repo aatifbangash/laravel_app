@@ -147,7 +147,7 @@ Following is used in the blade templates to load the env/config from the .env fi
 **FYI:** *'Laravel Blade Snippets'* is the vscode extension for blade snippets and code completion.
 
 ##### Basic blade template layout example. 
-layout file the base file which will be extended into the view files and view files will yield content into it. The main purpose of the layout is to avoid the content repetition.
+layout file is the file which will be extended into the view files and view files will yield content into it. The main purpose of the layout is to avoid the content repetition.
 
 ```html
 <!-- FILENAME: layouts/default.blade.php -->
