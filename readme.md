@@ -149,6 +149,7 @@ Following is used in the blade templates to load the env/config from the .env fi
 ##### Basic blade template layout example. 
 layout file is the file which will be extended into the view files and view files will yield content into it. The main purpose of the layout is to avoid the content repetition.
 
+###### layout file example.
 ```html
 <!-- FILENAME: layouts/default.blade.php -->
 
@@ -179,7 +180,7 @@ layout file is the file which will be extended into the view files and view file
 </html>
 ```
 
-##### View file example.
+###### View file example.
 ```html
 <!-- FILENAME: main.blade.php -->
 
