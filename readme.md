@@ -144,6 +144,7 @@ Following is used in the blade templates to load the env/config from the .env fi
 **app/public/css, app/public/js** are the folders for the compiled assets. Following will be included or will be loaded in the layout file.
 
 **app/resources/** is the folder for the layouts and views.
+
 **FYI:** *'Laravel Blade Snippets'* is the vscode extension for blade snippets and code completion.
 
 ##### Basic blade template layout example. 
