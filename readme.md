@@ -221,7 +221,7 @@ Route::get("/about", function(){
 ```
 ---
 #### Assets compilation.
-**app/resource/assets** is the assets directories. Every Laravel project is having the package.json file with dependencies like laravel-mix which used to compile and minify the assets from **app/resource/assets** into **app/public/css, app/public/js** folders which will later be included into the mail layout file to load.
+**app/resource/assets** is the assets directories. Every Laravel project is having the package.json file with dependencies like laravel-mix which used to compile and minify the assets from **app/resource/assets** into **app/public/css, app/public/js** folders which will later be included in the main layout file.
 
 ***Note:-*** We must not change the content of the assets in the public folder, rather we will make changes or add new css files in the resource/assets folder and then compile the assets via npm.
 
