@@ -50,7 +50,7 @@ $todo->title = "any title"; //set title for the todos
 $todo->save(); //save into database using ORM
 ```
 
-### Blate Template Engine
+### Blade Template Engine
 It is the template engine use by the laravel. It's simple and powerful. We can also use raw php in the blade template files. We can create custom components as well in the blade template. Template inheritance/partial is also very easy with the blade template. It has control structures like if, else, loops, etc.
 [Laravel Blade template reference](https://laravel.com/docs/5.4/blade)
 
@@ -139,4 +139,96 @@ Following is used in the blade templates to load the env/config from the .env fi
 ```html
 <span>{{config('app.name', 'default value')}}</span>
 ```
+
+### Blade templating and assets compiling
+**app/public/css, app/public/js** are the folders for the compiled assets. Following will be included or will be loaded in the layout file.
+
+**app/resources/** is the folder for the layouts and views.
+FYI: *Laravel Blade Snippets* is the vscode snippet and code completion extension.
+
+##### Basic blade template layout example. 
+layout file the base file which will be extended into the view files and view files will yield content into it. The main purpose of the layout is to avoid the content repetition.
+
+```html
+<!-- FILENAME: layouts/default.blade.php -->
+
+<!doctype html>
+<html>
+<head>
+    <!-- assets() function is used to load the assets from app/public/css directory -->
+    <link rel="stylesheet" type="text/css" href="{{assets('css/app.css')}}">
+
+    <!-- config method is used to load the env into the view files -->
+   <title>{{config('app.name', 'default value')}}</title>
+</head>
+<body>
+<div class="container">
+   <header class="row">
+    <!-- following directive is used to include the partials like includes/header.blade.php -->
+       @include('includes.header')
+   </header>
+   <div id="main" class="row">
+    <!-- @yield is used to include the content from the view files. -->
+           @yield('content')
+   </div>
+   <footer class="row">
+       <span>copyright: 2023</span>
+   </footer>
+</div>
+</body>
+</html>
+```
+
+##### View file example.
+```html
+<!-- FILENAME: main.blade.php -->
+
+<!-- @extends is used to extend the layout file (layouts/default.blade.php) -->
+@extends('layouts.default')
+
+<!-- Following section will be @yield in the mail layout file -->
+@section('content')
+   <p>following is the content of the page.</p>
+@endsection
+```
+#### Passing values to the view/template.
+```php
+Route::get("/about", function(){
+    $title = "Laravel application"; // can be single value or array.
+    // return view('file', compact("title")); // Or the following
+    return view('file')->with('title', $title);
+});
+```
+
+#### Rendering the passed values in the view/template.
+```html
+<h1>{{$title}}</h1>
+<strong>OR</strong>
+<h1><?php echo $title; ?></h1>
+```
+
+#### Blade template condition and loop.
+```html
+@section('content')
+   @if(count($data) > 0)
+
+        @foreach($data as $value)
+            <p>{{$value}}</p>
+        @endforeach
+
+   @endif
+@endsection
+```
+---
+#### Assets compilation.
+**app/resource/assets** is the assets directories. Every Laravel project is having the package.json file with dependencies like laravel-mix which used to compile and minify the assets from **app/resource/assets** into **app/public/css, app/public/js** folders which will later be included into the mail layout file to load.
+***Note:-*** We must not change the content of the assets in the public folder, rather we will make changes or add new css files in the resource/assets folder and then compile the assets via npm.
+
+###### In order to compile the assets we have to install the npm and run the following commands.
+>$ npm install **//in the project directory**
+
+>$ npm run dev **//to re-compile the assets whenever we make changes into the resource/assets**
+
+##### Or
+>$ npm run watch **//will constantly watching for the assets changes and re-compile automatically**
 
