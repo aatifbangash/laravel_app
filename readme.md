@@ -212,11 +212,9 @@ Route::get("/about", function(){
 ```html
 @section('content')
    @if(count($data) > 0)
-
         @foreach($data as $value)
             <p>{{$value}}</p>
         @endforeach
-
    @endif
 @endsection
 ```
