@@ -2,18 +2,23 @@
 Sanctum is the laravel token based authentication API.
 
 >$ composer create-project laravel/laravel laravel-sanctum-api
+
 **Note** create new project
 
 >$ php artisan serve
+
 **Note** Start the laravel server
 
 >$ composer require laravel/sanctum
+
 **Note** install the sanctum via composer
 
 >$ php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
 **Note** create sanctum migration and configuration files. Check the laravel documentation for the sanctum installation.
 
 >$ php artisan migrate
+
 **Note** run migration to create tables for token
 
 ```php
@@ -37,12 +42,15 @@ class Product extends Model {
 ```
 
 >$ php artisan make:controller ProductsController --api
+
 **Note** --api will create the API related resources only like (store, update, index, destroy only).
 
 >$ php artisan make:model Product --migration
+
 **Note** --migration will create the migration file as well for the model.
 
 >$ php artisan migration
+
 **Note** run migration files
 
 ```php
@@ -133,6 +141,7 @@ class AuthCtl extends Controller {
 Resource class are like the DTO or custom response used to modify the response before serving.
 
 >$ php artisan make:resource Article
+
 **Note** to create custom DTO or custom api response in Http/Resources/Article.php
 
 ```php
