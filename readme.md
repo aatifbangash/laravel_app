@@ -246,6 +246,7 @@ Route::get("/about", function(){
 ###### Controller
 Controller is used to get request from route and data from database via model and load view or json as a response to user.
 >$ php artisan make:controller PostsController
+
 **Note** it is the standard that the controller name should be plural.
 
 ```php
@@ -286,14 +287,17 @@ class PostsController extends Controller {
 **update()** => html edit form submit
 **destroy()** => deletion
 >$ php artisan make:controller PostsController --resource
+
 **Note**: following will create the controller along with the resource methods in it.
 
 >$ php artisan route:list
+
 **Note** show all routes along with it's name and method/resource
 
 ###### Model (Eloquent ORM)
 Laravel model is the class which is used to get the data from the database via Eloquent ORM.
 >$ php artisan make:model Post -m
+
 **Note** it is the standard that the model name should be singular. **-m** mean also create the migration file for the model.
 
 ```php
@@ -335,13 +339,16 @@ class CreatePostsTable extends Migration {
 }
 ```
 >$ php artisan migrate 
+
 **Note** following command will execute the up() method of the migrations.
 
 >$ php artisan migrate:rollback
+
 **Note** following method will execute the down() method of the migrations. migrations are being tracked in the `migration` table in the database.
 
 ###### Tinker
 >$ php artisan tinker
+
 **Note** tinker is php Repl used to interact with laravel application via terminal.
 
 ```bash
@@ -387,10 +394,12 @@ public function store(Request $req) {
 ```
 
 >$ composer require unisharp/laravel-ckeditor
+
 **Note** to install package via composer. Alway add package service provider in the config/app.php file
 
 ##### Enable authentication in the Laravel
 >$ php artisan make:auth
+
 **Note** it will enable the auth controller, model, migrations, middleware's, layouts with views for registration, login, forget password and logout.
 
 ##### Useful blade helpers
@@ -420,9 +429,11 @@ public function store(Request $req) {
 Migration file name must be descriptive.
 
 >$ php artisan make:migration create_user_table
+
 **Note** naming convention for creating the migration for the table
 
 >$ php artisan make:migration add_user_id_to_posts
+
 **Note** naming convention for creating the migration for adding column to table
 
 ##### Relationships
@@ -483,12 +494,14 @@ if($request->hasFile('myImage')) {
 ```
 
 >$ php artisan storage:link
+
 **Note** to create the symbolic link from resource/storage to public/storage. public/storage is the directory expose to the web.
 
 ##### Seeder and Factory
 Factory is used to seed fake data into the table.
 
 >$ php artisan make:seeder ArticleTableSeeder
+
 **Note** make seeder for the table
 
 ```php
@@ -501,6 +514,7 @@ public function run() {
 ```
 
 >$ php artisan make:factory ArticleFactory
+
 **Note** to create factory
 
 ```php
@@ -513,6 +527,7 @@ $factory->define(App\Article::class, function(Faker $faker) {
 ```
 
 >$ php artisan db:seed
+
 **Note** run seeder to insert fake data in the table.
 
 -----
