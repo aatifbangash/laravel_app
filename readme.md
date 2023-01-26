@@ -96,6 +96,7 @@ Route::get('path', callback);
 Route::post('path', callback);
 Route::put('path', callback);
 Route::delete('path', callback);
+Route::resource('path', ControllerName); // it will auto map all the Request methods with resource methods of the controller
 ```
 
 ### Views/Templates
@@ -232,4 +233,444 @@ Route::get("/about", function(){
 
 ##### Or
 >$ npm run watch **//will constantly watching for the assets changes and re-compile automatically**
+---
+##### Laravel life cycle
+* All the request in the laravel will first land on the the public/index.php
+* public/index.php execute composer autoload and load all the classes from composer vendor
+* After the composer autoload all the service providers will register and after the registration th boot method of the service providers will execute.
+* Request will go through the global middleware's to intercept the request
+* Request will be handled to routes to controller to model and view.
+* Response will be generated and will be given to middleware to filter the response.
+* finally the response will be serve to the user via public/index.php file.
 
+###### Controller
+Controller is used to get request from route and data from database via model and load view or json as a response to user.
+>$ php artisan make:controller PostsController
+**Note** it is the standard that the controller name should be plural.
+
+```php
+class PostsController extends Controller {
+    public function index() {
+        $posts = Post::all(); // get all post via Model. it will return the collection
+        $posts = Post::orderBy('title', 'desc')->get();
+        $posts = Post::where('title', 'my post')->get(); // where clause
+        $posts = Post::orderBy('title', 'desc')->take(1)->get(); // get single record
+
+        $post = Post::find($id); // get single record
+        $post->title = "change title";
+        $post->save(); // update the record
+        $post->delete(); //delete the record
+
+        $post->update($request->all()); //update the record with new data from $request
+
+        $posts = Post::orderBy('title', 'desc')->paginate(5); // get 5 records per page with pagination
+
+        // helper method to return the logged in user object
+        auth()->user()
+        return view('posts.index')->with('posts', $posts); // load the view file from posts/index.blade.php
+    }
+}
+```
+
+```html
+<!-- To display the pagination links -->
+{{$posts->links()}}
+```
+
+###### Controller Resource Methods
+**index()** => list of records
+**show()** => single record
+**create()** => html create form
+**store()** => html create form submit
+**edit()** => html edit form
+**update()** => html edit form submit
+**destroy()** => deletion
+>$ php artisan make:controller PostsController --resource
+**Note**: following will create the controller along with the resource methods in it.
+
+>$ php artisan route:list
+**Note** show all routes along with it's name and method/resource
+
+###### Model (Eloquent ORM)
+Laravel model is the class which is used to get the data from the database via Eloquent ORM.
+>$ php artisan make:model Post -m
+**Note** it is the standard that the model name should be singular. **-m** mean also create the migration file for the model.
+
+```php
+//NOTE:- 
+//Model is the base class, it already having all the methods which are useful for the interaction with the database.
+//If the Model name is Post then the table table will be posts in the database.
+
+class Post extends Model {
+    protected $table = "table_custom_name"; // to give custom table name for the model.
+    protected $primaryKey = "custom_field_for_pk"; // to give custom pk field for the table.
+    public $timestamps = true; // to set created_at and updated_at fields for the table.
+}
+```
+###### DB Library
+DB library can be used to write the raw queries. It should be used in case of complex queries.
+
+
+```php
+class PostsController extends Controller {
+    public function index() {
+        $posts = DB::select("SELECT * from posts"); // get all posts via db library and pass to view with with() method
+        return view("posts")->with('posts', $posts);
+    }
+}
+```
+
+###### Migrations
+Migrations are the schema files. Which is used to create the tables of the project. 
+
+```php
+class CreatePostsTable extends Migration {
+    public function up() {
+        // create table schema or alter the table schema
+    }
+
+    public function down() {
+        // drop the table of drop the table field
+    }
+}
+```
+>$ php artisan migrate 
+**Note** following command will execute the up() method of the migrations.
+
+>$ php artisan migrate:rollback
+**Note** following method will execute the down() method of the migrations. migrations are being tracked in the `migration` table in the database.
+
+###### Tinker
+>$ php artisan tinker
+**Note** tinker is php Repl used to interact with laravel application via terminal.
+
+```bash
+App\Post::count(); //count all posts
+$post = new App\Post();
+$post->title = 'my article';
+$post->body = 'content of the post';
+$post->save(); //save the post via tinker in the table
+
+quit
+```
+###### Controller level validation
+it is used to validate the request params and body in the resource methods.
+
+```php
+public function store(Request $req) {
+    $this->validate($req), [
+        'title' => 'required',
+        'body' => 'required',
+        'email' => 'required|unique',
+    ];
+
+    // to get input value from request
+    $name = $req->input("name");
+
+    // redirect with flash message.
+    return redirect("/post")->with("success", "completed");
+}
+```
+
+```html
+<!-- $errors will be populated if the validation failed. -->
+@if(count($errors) > 0)
+    @foreach($errors->all() as $err)
+        <li>{{$err}}</li>
+    @endforeach
+@endif
+
+<!-- To access the session value or flash message value. -->
+@if(session("success"))
+        <li>session("success")</li>
+@endif
+```
+
+>$ composer require unisharp/laravel-ckeditor
+**Note** to install package via composer. Alway add package service provider in the config/app.php file
+
+##### Enable authentication in the Laravel
+>$ php artisan make:auth
+**Note** it will enable the auth controller, model, migrations, middleware's, layouts with views for registration, login, forget password and logout.
+
+##### Useful blade helpers
+```html
+<!-- url() helper method is used for url based navigation -->
+<a href="{{ url('/') }}"> visit </a>
+
+<!-- url() helper method is used for route name based navigation -->
+<a href="{{ route('route_name') }}"> visit </a>
+
+@if(Auth::guest())
+    <!-- if user is not logged in -->
+@endif
+
+@if(Auth::user())
+    <!-- if user is logged in -->
+    Auth::user()->name <!-- return logged in user object -->
+@endif
+
+<!-- for csrf token in the form -->
+{{ csrf_field() }}
+<!-- OR -->
+@csrf
+```
+
+##### Migrations
+Migration file name must be descriptive.
+
+>$ php artisan make:migration create_user_table
+**Note** naming convention for creating the migration for the table
+
+>$ php artisan make:migration add_user_id_to_posts
+**Note** naming convention for creating the migration for adding column to table
+
+##### Relationships
+
+```php
+class Post extends Model {
+
+    // Post belongs to User
+    // One to One (One post --> One user)
+    public function user() {
+        return $this->belongsTo('App\User');
+    }
+}
+
+
+class User extens Model {
+
+    // User has many Posts
+    // One to Many (One user --> Many Posts)
+    public function posts() {
+        return $this->hasMany('App\Post');
+    }
+}
+
+$user->posts // get all posts of the user in controller or view
+$post->user->name // get user of the post in the controller or view
+
+public function __construct() {
+
+    // middleware enabled by the auth
+    // middleware are the function execute before route to process request object and is used to authenticate and authorize the user.
+    // middleware applied in the constructor of the class will apply only to the class in which it is called.
+
+    $this->middleware('auth'); // blocked request if user is logged in
+    $this->middleware('guest'); // if user is not logged in
+
+    // apply the middleware on all the resources methods except index and show.
+    $this->middleware('auth', ['except' => ['index', 'show']]);
+}
+```
+
+##### Laravel file uploading
+
+```php
+if($request->hasFile('myImage')) {
+    // get filename with extension
+    $filenameWithExtension = $request->file('myImage')->getClientOriginalImage();
+
+    // get file extension
+    $extension = $request->file('myImage')->getClientOriginalExtension();
+
+    // upload image to resource/storage/public/images directory
+    $path = $request->file('myImage')->storeAs('public/images', 'newFileName.png');
+
+    // delete the via Storage facade
+    Storage::delete('public/images/newFileName.png');
+}
+```
+
+>$ php artisan storage:link
+**Note** to create the symbolic link from resource/storage to public/storage. public/storage is the directory expose to the web.
+
+##### Seeder and Factory
+Factory is used to seed fake data into the table.
+
+>$ php artisan make:seeder ArticleTableSeeder
+**Note** make seeder for the table
+
+```php
+// ArticleTableSeeder.php
+public function run() {
+
+    // using factory create 30 records via Article Model
+    factory(App\Article::class, 30)->create();
+}
+```
+
+>$ php artisan make:factory ArticleFactory
+**Note** to create factory
+
+```php
+$factory->define(App\Article::class, function(Faker $faker) {
+    return [
+        'title' => $faker->text(50),
+        'body' => $faker->text(50)
+    ];
+});
+```
+
+>$ php artisan db:seed
+**Note** run seeder to insert fake data in the table.
+
+-----
+
+# Laravel sanctum based API
+Sanctum is the laravel token based authentication API.
+
+>$ composer create-project laravel/laravel laravel-sanctum-api
+**Note** create new project
+
+>$ php artisan serve
+**Note** Start the laravel server
+
+>$ composer require laravel/sanctum
+**Note** install the sanctum via composer
+
+>$ php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+**Note** create sanctum migration and configuration files. Check the laravel documentation for the sanctum installation.
+
+>$ php artisan migrate
+**Note** run migration to create tables for token
+
+```php
+class Product extends Model {
+
+    // custom table name for the products
+    protected $table = 'products';
+
+    // following fields must be provided during products creation
+    protected $fillable = ['name', 'slug', 'price'];
+    
+    // must not return in the response
+    protected $hidden = ['password', 'token'];
+
+    // cast or keys mapping before sending in the response
+    protected $casts = [
+        'date' => "created_at",
+        "data" => "body"
+    ];
+}
+```
+
+>$ php artisan make:controller ProductsController --api
+**Note** --api will create the API related resources only like (store, update, index, destroy only).
+
+>$ php artisan make:model Product --migration
+**Note** --migration will create the migration file as well for the model.
+
+>$ php artisan migration
+**Note** run migration files
+
+```php
+// auto map all the request methods with the controller methods 
+Route::resource('products', ProductController::class);
+
+// get route map with the controller
+Route::get('/products/search/{name}', [ProductController::class, 'search']);
+
+// get route
+Route::get('/products', [ProductController::class, 'index']);
+
+// post route
+Route::post('products', [ProductController::class, 'store']);
+
+// group routes and apply auth middleware on the routes. to protect routes.
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::resource('products', ProductController::class);
+});
+```
+
+##### Controller
+
+```php
+class AuthCtl extends Controller {
+
+    public function register(Request $req) {
+
+        // validate request
+        $fields = $req->validation([
+            'name' => 'required|string',
+            'email' => 'required|string|unique:users,email', //email must be unique in the email column of the users table.
+            'password' => 'required|string|confirmed' // password and password_confirmation fields must be same
+        ]);
+
+        // create user 
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']) // encrypt password
+        ]);
+
+        // to create plain token for the user, need to be store in the COOKIE or localStorage on the front-end 
+        // and is used to access the protected routes.
+        // will be used as a Bearer Token in the API calling
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+
+        //  response with response code
+        return response($response, 200);
+    }
+
+    public function login(Request $req) {
+        // validate request
+        $fields = $req->validation([
+            'email' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        $user = User::where('email', $fields['email'])->first();
+
+        //check password
+        if(!$user || !Hash::check($field['password'], $user->password)) {
+            return response(['not_found'], 401);
+        }
+
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+        return response($response, 200);
+    }
+
+    public function logout(Request $req) {
+        // delete the token at logout
+        auth()->user()->token()->delete();
+    }
+}
+```
+
+##### Resource class
+Resource class are like the DTO or custom response used to modify the response before serving.
+
+>$ php artisan make:resource Article
+**Note** to create custom DTO or custom api response in Http/Resources/Article.php
+
+```php
+// Http/Resources/Article.php
+
+public function toArray($request) {
+    return [
+        'id' => $this->id,
+        'title' => $this->title,
+        'date_created' => date(Y-m-s H:i:s, $this->timestamp),
+        'body' => $this->body
+    ];
+}
+
+// following method is used to append/add extra data/meta to the response objects
+public function with($request) {
+    return [
+        'version' => '1.0.0',
+        'author_url' => url('https://atif.com')
+    ];
+}
+```
